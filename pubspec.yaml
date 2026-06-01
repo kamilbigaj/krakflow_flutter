@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_local_notifications: 19.0.0
   http: ^1.1.0
   hive_ce: 2.19.3
   hive_ce_flutter: 2.3.3

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'dart:math';
-
 import 'models/task.dart';
 import 'services/task_local_database.dart';
 import 'services/task_sync_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
   await Hive.initFlutter();
   await Hive.openBox("tasks");
   runApp(const MyApp());
@@ -163,8 +164,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           done: task.done,
                           priority: task.priority,
                           onChanged: (value) async {
-                            task.done = value ?? false;
+                            final isDone = value ?? false;
+                            final wasDone = task.done;
+                            task.done = isDone;
                             await TaskLocalDatabase.updateTask(task);
+                            if (!wasDone && isDone) {
+                              await NotificationService.showTaskDoneNotification(task.title);
+                            }
+
                             _refreshData();
                           },
                           onTap: () async {
